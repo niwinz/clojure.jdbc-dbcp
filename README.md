@@ -9,13 +9,13 @@ Note: only works on >= jdk7
 Leiningen
 
 ```clojure
-[clojure.jdbc/clojure.jdbc-dbcp "0.2.1"]
+[clojure.jdbc/clojure.jdbc-dbcp "0.3.0"]
 ```
 
 Gradle
 
 ```groovy
-compile "clojure.jdbc:clojure.jdbc-dbcp:0.2.1"
+compile "clojure.jdbc:clojure.jdbc-dbcp:0.3.0"
 ```
 
 Maven
@@ -24,7 +24,7 @@ Maven
 <dependency>
   <groupId>clojure.jdbc</groupId>
   <artifactId>clojure.jdbc-dbcp</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
