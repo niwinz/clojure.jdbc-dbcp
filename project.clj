@@ -1,4 +1,4 @@
-(defproject clojure.jdbc/clojure.jdbc-dbcp "0.2.1-SNAPSHOT"
+(defproject clojure.jdbc/clojure.jdbc-dbcp "0.3.0"
   :description "Apache Commons JDBC connection pool implementation for clojure.jdbc."
   :url "http://github.com/niwibe/clojure.jdbc"
   :license {:name "Apache 2.0"
