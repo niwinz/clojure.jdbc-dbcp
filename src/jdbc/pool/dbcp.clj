@@ -13,40 +13,54 @@
 ;; limitations under the License.
 
 (ns jdbc.pool.dbcp
-  (:require [jdbc.pool :refer [normalize-dbspec]])
-  (:import org.apache.commons.dbcp2.BasicDataSource))
+  (:require [jdbc.core :refer [uri->dbspec]])
+  (:import org.apache.commons.dbcp2.BasicDataSource
+           java.net.URI))
+
+(defn- normalize-dbspec
+  "Normalizes a dbspec for connection pool implementations."
+  [{:keys [name vendor host port] :as dbspec}]
+  (cond
+   (or (string? dbspec) (instance? URI dbspec))
+   (uri->dbspec dbspec)
+
+   (and name vendor)
+   (let [host   (or host "127.0.0.1")
+         port   (if port (str ":" port) "")
+         dbspec (dissoc dbspec :name :vendor :host :port)]
+     (assoc dbspec
+       :subprotocol vendor
+       :subname (str "//" host port "/" name)))
+
+   (map? dbspec)
+   dbspec))
 
 (defn make-datasource-spec
   "Given a plain dbspec, convert it on datasource dbspec
   using apachr commons connection pool implementation."
   [dbspec]
-  (let [normalized (normalize-dbspec dbspec)]
-    (when (or (:factory normalized)
-              (:connection-uri normalized))
-      (throw (RuntimeException. "Can not create connection pool from dbspec with factory or connection-url")))
-    (when (:datasource normalized)
-      (throw (RuntimeException. "Already have datasource.")))
-    {:datasource (doto (BasicDataSource.)
-                   (.setDriverClassName (:classname normalized))
-                   (.setUrl (str "jdbc:"
-                                 (:subprotocol normalized) ":"
-                                 (:subname normalized)))
-                   (.setUsername (:user normalized))
-                   (.setPassword (:password normalized))
-                   (.setInitialSize (:initial-size normalized 0))
-                   (.setMaxIdle (:max-idle normalized 3))
-                   (.setMaxTotal (:max-total normalized 15))
-                   (.setMinIdle (:min-idle normalized 0))
-                   (.setMaxWaitMillis (:max-wait-millis normalized -1))
-
-                   (.setTestOnCreate (:test-on-create normalized false))
-                   (.setTestOnBorrow (:test-on-borrow normalized true))
-                   (.setTestOnReturn (:test-on-return normalized false))
-                   (.setTestWhileIdle (:test-while-idle normalized true))
-                   (.setTimeBetweenEvictionRunsMillis (:time-between-eviction-runs-millis normalized -1))
-                   (.setNumTestsPerEvictionRun (:num-tests-per-eviction-run normalized 3))
-                   (.setMinEvictableIdleTimeMillis (:min-evictable-idle-time-millis normalized (* 1000 60 30)))
-                   (.setMaxConnLifetimeMillis (:max-conn-lifetime-millis normalized -1))
-                   (.setValidationQuery (:validation-query normalized nil)))}))
-
-
+  (let [dbspec (normalize-dbspec dbspec)
+        ds     (BasicDataSource.)]
+    (if (:connection-uri dbspec)
+      (.setUrl ds (:connection-uri dbspec))
+      (.setUrl ds (str "jdbc:"
+                       (:subprotocol dbspec) ":"
+                       (:subname dbspec))))
+    {:datasource (doto ds
+                   (.setDriverClassName (:classname dbspec))
+                   (.setUsername (:user dbspec))
+                   (.setPassword (:password dbspec))
+                   (.setInitialSize (:initial-size dbspec 0))
+                   (.setMaxIdle (:max-idle dbspec 3))
+                   (.setMaxTotal (:max-total dbspec 15))
+                   (.setMinIdle (:min-idle dbspec 0))
+                   (.setMaxWaitMillis (:max-wait-millis dbspec -1))
+                   (.setTestOnCreate (:test-on-create dbspec false))
+                   (.setTestOnBorrow (:test-on-borrow dbspec true))
+                   (.setTestOnReturn (:test-on-return dbspec false))
+                   (.setTestWhileIdle (:test-while-idle dbspec true))
+                   (.setTimeBetweenEvictionRunsMillis (:time-between-eviction-runs-millis dbspec -1))
+                   (.setNumTestsPerEvictionRun (:num-tests-per-eviction-run dbspec 3))
+                   (.setMinEvictableIdleTimeMillis (:min-evictable-idle-time-millis dbspec (* 1000 60 30)))
+                   (.setMaxConnLifetimeMillis (:max-conn-lifetime-millis dbspec (* 3600 1000)))
+                   (.setValidationQuery (:validation-query dbspec nil)))}))
