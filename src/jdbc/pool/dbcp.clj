@@ -50,17 +50,22 @@
                    (.setDriverClassName (:classname dbspec))
                    (.setUsername (:user dbspec))
                    (.setPassword (:password dbspec))
-                   (.setInitialSize (:initial-size dbspec 0))
-                   (.setMaxIdle (:max-idle dbspec 3))
-                   (.setMaxTotal (:max-total dbspec 15))
-                   (.setMinIdle (:min-idle dbspec 0))
+
+                   ;; Pool Size Management
+                   (.setInitialSize (:initial-pool-size dbspec 0))
+                   (.setMaxIdle (:max-pool-idle dbspec 3))
+                   (.setMaxTotal (:max-pool-size dbspec 15))
+                   (.setMinIdle (:min-pool-size dbspec 0))
                    (.setMaxWaitMillis (:max-wait-millis dbspec -1))
-                   (.setTestOnCreate (:test-on-create dbspec false))
-                   (.setTestOnBorrow (:test-on-borrow dbspec true))
-                   (.setTestOnReturn (:test-on-return dbspec false))
-                   (.setTestWhileIdle (:test-while-idle dbspec true))
-                   (.setTimeBetweenEvictionRunsMillis (:time-between-eviction-runs-millis dbspec -1))
-                   (.setNumTestsPerEvictionRun (:num-tests-per-eviction-run dbspec 3))
-                   (.setMinEvictableIdleTimeMillis (:min-evictable-idle-time-millis dbspec (* 1000 60 30)))
-                   (.setMaxConnLifetimeMillis (:max-conn-lifetime-millis dbspec (* 3600 1000)))
-                   (.setValidationQuery (:validation-query dbspec nil)))}))
+
+                   ;; Connection eviction
+                   (.setMaxConnLifetimeMillis (* 1000 (:max-connection-lifetime dbspec 3600)))
+
+                   ;; Connection testing
+                   (.setValidationQuery (:test-connection-query dbspec nil))
+                   (.setTestOnBorrow (:test-connection-on-borrow dbspec false))
+                   (.setTestOnReturn (:test-connection-on-return dbspec false))
+                   (.setTestWhileIdle (:test-connection-while-idle dbspec true))
+                   (.setTimeBetweenEvictionRunsMillis (* 1000 (:test-idle-connections-period dbspec 800)))
+                   (.setNumTestsPerEvictionRun 4)
+                   (.setMinEvictableIdleTimeMillis (:max-connection-idle-lifetime dbspec 300)))}))
