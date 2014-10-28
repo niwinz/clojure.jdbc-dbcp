@@ -4,7 +4,7 @@
   :license {:name "Apache 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.txt"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [clojure.jdbc "0.3.0"]
+                 [clojure.jdbc "0.3.1"]
                  [org.apache.commons/commons-dbcp2 "2.0.1"]]
 
   :profiles {:dev {:dependencies [[com.h2database/h2 "1.3.176"]]}})
