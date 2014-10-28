@@ -71,6 +71,6 @@
                     (.setTestOnBorrow (:test-connection-on-borrow dbspec false))
                     (.setTestOnReturn (:test-connection-on-return dbspec false))
                     (.setTestWhileIdle (:test-connection-while-idle dbspec true))
-                    (.setTimeBetweenEvictionRunsMillis (:test-idle-connections-period dbspec 800000)))
+                    (.setTimeBetweenEvictionRunsMillis (:test-idle-connections-period dbspec 800000))
                     (.setNumTestsPerEvictionRun 4)
                     (.setMinEvictableIdleTimeMillis (:max-connection-idle-lifetime dbspec 1800000))))))
