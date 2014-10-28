@@ -17,6 +17,11 @@
   (:import org.apache.commons.dbcp2.BasicDataSource
            java.net.URI))
 
+(defrecord DataSource [datasource]
+  java.io.Closeable
+  (close [_]
+    (.close datasource)))
+
 (defn- normalize-dbspec
   "Normalizes a dbspec for connection pool implementations."
   [{:keys [name vendor host port] :as dbspec}]
@@ -46,26 +51,26 @@
       (.setUrl ds (str "jdbc:"
                        (:subprotocol dbspec) ":"
                        (:subname dbspec))))
-    {:datasource (doto ds
-                   (.setDriverClassName (:classname dbspec))
-                   (.setUsername (:user dbspec))
-                   (.setPassword (:password dbspec))
+    (->DataSource (doto ds
+                    (.setDriverClassName (:classname dbspec))
+                    (.setUsername (:user dbspec))
+                    (.setPassword (:password dbspec))
 
-                   ;; Pool Size Management
-                   (.setInitialSize (:initial-pool-size dbspec 0))
-                   (.setMaxIdle (:max-pool-idle dbspec 3))
-                   (.setMaxTotal (:max-pool-size dbspec 15))
-                   (.setMinIdle (:min-pool-size dbspec 0))
-                   (.setMaxWaitMillis (:max-wait-millis dbspec -1))
+                    ;; Pool Size Management
+                    (.setInitialSize (:initial-pool-size dbspec 0))
+                    (.setMaxIdle (:max-pool-idle dbspec 3))
+                    (.setMaxTotal (:max-pool-size dbspec 15))
+                    (.setMinIdle (:min-pool-size dbspec 0))
+                    (.setMaxWaitMillis (:max-wait-millis dbspec -1))
 
-                   ;; Connection eviction
-                   (.setMaxConnLifetimeMillis (* 1000 (:max-connection-lifetime dbspec 3600)))
+                    ;; Connection eviction
+                    (.setMaxConnLifetimeMillis (* 1000 (:max-connection-lifetime dbspec 3600)))
 
-                   ;; Connection testing
-                   (.setValidationQuery (:test-connection-query dbspec nil))
-                   (.setTestOnBorrow (:test-connection-on-borrow dbspec false))
-                   (.setTestOnReturn (:test-connection-on-return dbspec false))
-                   (.setTestWhileIdle (:test-connection-while-idle dbspec true))
-                   (.setTimeBetweenEvictionRunsMillis (* 1000 (:test-idle-connections-period dbspec 800)))
-                   (.setNumTestsPerEvictionRun 4)
-                   (.setMinEvictableIdleTimeMillis (:max-connection-idle-lifetime dbspec 300)))}))
+                    ;; Connection testing
+                    (.setValidationQuery (:test-connection-query dbspec nil))
+                    (.setTestOnBorrow (:test-connection-on-borrow dbspec false))
+                    (.setTestOnReturn (:test-connection-on-return dbspec false))
+                    (.setTestWhileIdle (:test-connection-while-idle dbspec true))
+                    (.setTimeBetweenEvictionRunsMillis (* 1000 (:test-idle-connections-period dbspec 800)))
+                    (.setNumTestsPerEvictionRun 4)
+                    (.setMinEvictableIdleTimeMillis (:max-connection-idle-lifetime dbspec 300))))))
