@@ -61,16 +61,16 @@
                     (.setMaxIdle (:max-pool-idle dbspec 3))
                     (.setMaxTotal (:max-pool-size dbspec 15))
                     (.setMinIdle (:min-pool-size dbspec 0))
-                    (.setMaxWaitMillis (:max-wait-millis dbspec -1))
+                    (.setMaxWaitMillis (:max-wait dbspec -1))
 
                     ;; Connection eviction
-                    (.setMaxConnLifetimeMillis (* 1000 (:max-connection-lifetime dbspec 3600)))
+                    (.setMaxConnLifetimeMillis (:max-connection-lifetime dbspec 3600000))
 
                     ;; Connection testing
                     (.setValidationQuery (:test-connection-query dbspec nil))
                     (.setTestOnBorrow (:test-connection-on-borrow dbspec false))
                     (.setTestOnReturn (:test-connection-on-return dbspec false))
                     (.setTestWhileIdle (:test-connection-while-idle dbspec true))
-                    (.setTimeBetweenEvictionRunsMillis (* 1000 (:test-idle-connections-period dbspec 800)))
+                    (.setTimeBetweenEvictionRunsMillis (:test-idle-connections-period dbspec 800000)))
                     (.setNumTestsPerEvictionRun 4)
-                    (.setMinEvictableIdleTimeMillis (:max-connection-idle-lifetime dbspec 300))))))
+                    (.setMinEvictableIdleTimeMillis (:max-connection-idle-lifetime dbspec 1800000))))))
